@@ -1,0 +1,20 @@
+{
+  "name": "codingfuture-cfmetrics",
+  "version": "0.0.1",
+  "vcs": "git",
+  "package": [
+    "pkg"
+  ],
+  "tools": {
+    "puppet": "*",
+    "release": "*"
+  },
+  "plugins": {
+    "release": "futoin.cid.misc.releasetool"
+  },
+  "toolTune": {
+    "release": {
+      "changelog": "CHANGELOG.md"
+    }
+  }
+}
