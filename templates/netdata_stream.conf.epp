@@ -6,7 +6,7 @@
 [stream]
     enabled = yes
     destination = <%= $destination %>
-    api key = <%= fqdn_uuid($target) %>
+    api key = <%= fqdn_uuid($cfmetrics::netdata::target) %>
 <% } -%>
 
 <% if $cfmetrics::netdata::server { -%>

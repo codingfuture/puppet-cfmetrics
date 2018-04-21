@@ -137,22 +137,24 @@ class cfmetrics::netdata (
             'from', 'resources',
                 ['extract', [ 'parameters' ],
                     ['and',
+                        ['=', 'type', 'Cfmetrics_collector'],
                         ['=', 'certname', $target],
-                        ['=', 'type', 'cfmetrics_collector'],
                         ['=', 'title', $service_name],
                     ],
                 ],
-        ]).dig(0, 'paramaters')
+        ])
 
-        if $target_info {
-            $target_listen = $target_info['settings_tune']['cfmetrics']['listen'] ? {
+        if $target_info.size == 1 {
+            $target_params = $target_info[0]['parameters']['settings_tune']['cfmetrics']
+
+            $target_listen = $target_params['listen'] ? {
                 '*' => $target,
-                default => $target_info['settings_tune']['cfmetrics']['listen']
+                default => $target_params['listen']
             }
-            $target_port = $target_info['settings_tune']['cfmetrics']['port']
-            $target_address = "${target}:${target_port}"
+            $target_port = $target_params['port']
+            $target_address = "${target_listen}:${target_port}"
 
-            $target_fw_service = "${user}-target"
+            $target_fw_service = "${user}_target"
 
             ensure_resource('cfnetwork::describe_service', $target_fw_service, {
                 server => "tcp/${target_port}",
@@ -160,9 +162,15 @@ class cfmetrics::netdata (
 
             cfnetwork::client_port { "any:${target_fw_service}":
                 user => $user,
+                dst  => $target_listen,
             }
         } else {
             $target_address = undef
+
+            cf_notify { 'cfmetrics::netdata::target':
+                message  => "Failed to find cfmetrics '${target}' target",
+                loglevel => warning,
+            }
         }
     } else {
         $target_address = undef
