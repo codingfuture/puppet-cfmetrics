@@ -1,0 +1,18 @@
+<%
+    $settings = $cfmetrics::netdata::act_settings
+    $destination = $cfmetrics::netdata::target_address
+-%>
+<% if $destination { -%>
+[stream]
+    enabled = yes
+    destination = <%= $destination %>
+    api key = <%= fqdn_uuid($target) %>
+<% } -%>
+
+<% if $cfmetrics::netdata::server { -%>
+[<%= fqdn_uuid($::facts['fqdn']) %>]
+    enabled = yes
+    allow from = *
+    default history = <%= pick($settings['global']['history'], 600) %>
+    default memory mode = save
+<% } -%>
