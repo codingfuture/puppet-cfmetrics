@@ -55,13 +55,11 @@ class cfmetrics::netdata (
     if $binary_install {
         $exec_name = 'Install netdata from binary'
         $install_script = 'kickstart-static64.sh'
-        $extra_opts = []
+        $extra_opts = ''
     } else {
         $exec_name = 'Install netdata from source'
         $install_script = 'kickstart.sh'
-        $extra_opts = [
-            '--install /opt',
-        ]
+        $extra_opts = '--install /opt'
     }
 
     $latest_binary_stamp = '/etc/cfsystem/netdata-latest.gz.run'
@@ -90,8 +88,9 @@ class cfmetrics::netdata (
             '--',
             '/dev/stdin',
             '--dont-wait --dont-start-it',
+            $extra_opts,
             "&& /bin/cp -f ${latest_binary_stamp} ${installled_binary_stamp}",
-        ] + $extra_opts).join(' '),
+        ]).join(' '),
         unless     => "/usr/bin/diff -q ${latest_binary_stamp} ${installled_binary_stamp}",
         environment => [
             "http_proxy=${cfsystem::http_proxy}",
