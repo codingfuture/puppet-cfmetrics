@@ -64,6 +64,24 @@ class cfmetrics::netdata (
         ]
     }
 
+    $latest_binary_stamp = '/etc/cfsystem/netdata-latest.gz.run'
+    $installled_binary_stamp = "${root_dir}/etc/netdata/uptodate.stamp"
+
+    # Get new version not more often than once per day.
+    # The stamp can be always removed manually to force update check.
+    exec { 'Getting latest netdata version':
+        command => [
+            "/usr/bin/wget -O${latest_binary_stamp}.tmp",
+            "'https://raw.githubusercontent.com/firehol/binary-packages/master/netdata-latest.gz.run'",
+            "&& /bin/mv -f ${latest_binary_stamp}.tmp ${latest_binary_stamp}",
+        ].join(' '),
+        unless  => "/usr/bin/find ${latest_binary_stamp} -mtime -1 | /bin/grep -q '^'",
+    } ->
+    file { $latest_binary_stamp:
+        ensure  => file,
+        content => '',
+        replace => false,
+    } ->
     exec { $exec_name:
         command     => ([
             '/usr/bin/curl -Ssf --connect-timeout 5',
@@ -72,8 +90,9 @@ class cfmetrics::netdata (
             '--',
             '/dev/stdin',
             '--dont-wait --dont-start-it',
+            "&& /bin/cp -f ${latest_binary_stamp} ${installled_binary_stamp}",
         ] + $extra_opts).join(' '),
-        creates     => $root_dir,
+        unless     => "/usr/bin/diff -q ${latest_binary_stamp} ${installled_binary_stamp}",
         environment => [
             "http_proxy=${cfsystem::http_proxy}",
             "HTTPS_PROXY=${cfsystem::http_proxy}",
