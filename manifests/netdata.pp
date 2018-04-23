@@ -65,6 +65,15 @@ class cfmetrics::netdata (
         $extra_opts = '--install /opt'
     }
 
+    if empty($cfsystem::http_proxy) {
+        $curl_env = []
+    } else {
+        $curl_env = [
+            "http_proxy=${cfsystem::http_proxy}",
+            "HTTPS_PROXY=${cfsystem::http_proxy}",
+        ]
+    }
+
     $latest_binary_stamp = '/etc/cfsystem/netdata-latest.gz.run'
     $installled_binary_stamp = "${root_dir}/etc/netdata/uptodate.stamp"
 
@@ -77,13 +86,13 @@ class cfmetrics::netdata (
             "&& /bin/mv -f ${latest_binary_stamp}.tmp ${latest_binary_stamp}",
         ].join(' '),
         unless  => "/usr/bin/find ${latest_binary_stamp} -mtime -1 | /bin/grep -q '^'",
-    } ->
-    file { $latest_binary_stamp:
+    }
+    -> file { $latest_binary_stamp:
         ensure  => file,
         content => '',
         replace => false,
-    } ->
-    exec { $exec_name:
+    }
+    -> exec { $exec_name:
         command     => ([
             '/usr/bin/curl -Ssf --connect-timeout 5',
             "${mirror}/${install_script} |",
@@ -94,11 +103,8 @@ class cfmetrics::netdata (
             $extra_opts,
             "&& /bin/cp -f ${latest_binary_stamp} ${installled_binary_stamp}",
         ]).join(' '),
-        unless     => "/usr/bin/diff -q ${latest_binary_stamp} ${installled_binary_stamp}",
-        environment => [
-            "http_proxy=${cfsystem::http_proxy}",
-            "HTTPS_PROXY=${cfsystem::http_proxy}",
-        ],
+        unless      => "/usr/bin/diff -q ${latest_binary_stamp} ${installled_binary_stamp}",
+        environment => $curl_env,
     }
     -> anchor { 'netdata-installed': }
 
@@ -115,7 +121,7 @@ class cfmetrics::netdata (
     #---
     if $server {
         if $iface == 'local' {
-            fail('Cannot mix sink=true and iface=local')
+            fail('Cannot mix server=true and iface=local')
         }
 
         $clients = cfsystem::query([
