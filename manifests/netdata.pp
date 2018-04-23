@@ -23,6 +23,10 @@ class cfmetrics::netdata (
         $target = undef,
     Boolean
         $server = false,
+    Boolean
+        $registry = false,
+    Optional[String[1]]
+        $registry_url = undef,
 
     Hash
         $settings_tune = {},
@@ -275,10 +279,12 @@ class cfmetrics::netdata (
         'cfmetrics' => merge(
             $cfmetrics_tune,
             {
-                port   => $fact_port,
-                listen => $listen,
-                target => $target_address,
-                tsdb   => $tsdb,
+                port         => $fact_port,
+                listen       => $listen,
+                target       => $target_address,
+                tsdb         => $tsdb,
+                registry     => $registry,
+                registry_url => $registry_url,
             }
         ),
     }

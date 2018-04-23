@@ -75,6 +75,8 @@ Puppet::Type.type(:cfmetrics_collector).provide(
         listen = cfmetrics_settings['listen']
         target = cfmetrics_settings['target']
         tsdb = cfmetrics_settings['tsdb']
+        registry = cfmetrics_settings['registry']
+        registry_url = cfmetrics_settings['registry_url']
         
         #---
         conf_file = "#{conf_dir}/netdata.conf"
@@ -93,6 +95,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             'web' => {
                 'bind to' => "#{listen}:#{port}",
             },
+            'registry' => {},
         }
 
         if target
@@ -108,6 +111,14 @@ Puppet::Type.type(:cfmetrics_collector).provide(
                 'type' => 'opentsdb',
                 'destination' => tsdb,
             }
+        end
+
+        if registry
+            conf_settings['registry']['enabled'] = 'yes'
+        end
+
+        if registry_url
+            conf_settings['registry']['registry to announce'] = registry_url
         end
 
         # tunes
