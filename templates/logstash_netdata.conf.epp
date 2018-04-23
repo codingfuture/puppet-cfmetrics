@@ -1,0 +1,49 @@
+<% |
+    String[1] $root_dir,
+| -%>
+
+input {
+    tcp {
+        id => "tsdb_tcp"
+        host => "127.0.0.1"
+        port => "${CF_PORT}"
+    }
+}
+
+filter {
+    grok {
+        match => {
+            message => "^put %{NOTSPACE:name} %{NOTSPACE:@timestamp} %{NOTSPACE:value} host=%{NOTSPACE:mhost}"
+        }
+        remove_field => [
+            '@version',
+            'host',
+            'message',
+            'port'
+        ]
+    }
+    mutate {
+        rename => {
+            'mhost' => 'host'
+        }
+        convert => {
+            value => 'float'
+        }
+    }
+}
+
+output {
+    if '_grokparsefailure' in [tags] {
+        stdout { codec => rubydebug { metadata => true } }
+    } else {
+        elasticsearch {
+            id => "metrics_sink"
+            hosts => "http://${DB_HOST}:${DB_PORT}"
+            index => "metrics-%{+YYYY.MM.dd}"
+            manage_template => true
+            template => "/etc/cfsystem/cfmetrics_elasticsearch.json"
+            template_name => "cfmetrics"
+            template_overwrite => true
+        }
+    }
+}

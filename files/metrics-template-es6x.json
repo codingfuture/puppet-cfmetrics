@@ -1,0 +1,26 @@
+{
+    "index_patterns" : [ "metrics-*" ],
+    "version" : 60002,
+    "settings" : {
+        "index.codec" : "best_compression",
+        "index.refresh_interval" : "5s"
+    },
+    "mappings" : {
+        "doc" : {
+            "_source" : {
+                "enabled" : false
+            },
+            "_all" : {
+                "enabled" : false
+            },
+            "date_detection" : false,
+            "dynamic" : false,
+            "properties" : {
+                "@timestamp": { "type": "date" },
+                "host": { "type": "keyword" },
+                "name": { "type": "keyword" },
+                "value": { "type": "double", "doc_values": false, "index": false }
+            }
+        }
+    }
+}

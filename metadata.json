@@ -42,6 +42,10 @@
     {
       "name": "codingfuture-cfdb",
       "version_requirement": ">= 1.0.0 <2.0.0"
+    },
+    {
+      "name": "codingfuture-cflogsink",
+      "version_requirement": ">= 1.0.0 <2.0.0"
     }
   ],
   "data_provider": "hiera"

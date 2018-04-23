@@ -74,7 +74,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
         port = cfmetrics_settings['port']
         listen = cfmetrics_settings['listen']
         target = cfmetrics_settings['target']
-        backend = cfmetrics_settings['backend']
+        tsdb = cfmetrics_settings['tsdb']
         
         #---
         conf_file = "#{conf_dir}/netdata.conf"
@@ -100,11 +100,13 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             conf_settings['web']['mode'] = 'none'
         end
 
-        if backend
+        if tsdb
             conf_settings['backend'] = {
                 'enabled' => 'yes',
-                'data source' => 'as collected',
-                'update every' => '10',
+                'data source' => 'average',
+                'update every' => '60',
+                'type' => 'opentsdb',
+                'destination' => tsdb,
             }
         end
 

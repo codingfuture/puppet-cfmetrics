@@ -33,6 +33,9 @@ class cfmetrics::netdata (
 
     Array[String[1]]
         $extra_clients = [],
+
+    Optional[ Hash[String[1],Any] ]
+        $logstash = undef,
 ) {
     $user = 'netdata'
     $group = $user
@@ -222,6 +225,41 @@ class cfmetrics::netdata (
         $auto_memory_min = $base_mem + $history_mem
     }
 
+
+    # Logstash-based backend for small/medium scale
+    #---
+    if $logstash {
+        $logstash_port = cfsystem::gen_port('cflogstash-metrics', $logstash['port'])
+        $tsdb = "127.0.0.1:${logstash_port}"
+
+        file { '/etc/cfsystem/cfmetrics_elasticsearch.json':
+            mode    => '0644',
+            content => file('cfmetrics/metrics-template-es6x.json'),
+        }
+        -> Cflogsink::Endpoint['netdata']
+
+        create_resources('cflogsink::endpoint', {
+            'netdata' => {
+                type          => 'logstash',
+                config        => 'cfmetrics/logstash_netdata.conf.epp',
+                iface         => 'local',
+                port          => $logstash_port,
+                settings_tune => merge(
+                    {
+                        'pipeline.batch.size' => 1024,
+                    },
+                    pick($logstash['settings_tune'], {})
+                ),
+            }
+        }, $logstash)
+
+        cfnetwork::client_port { 'local:logstash_netdata:tsdb':
+            user => $user,
+        }
+    } else {
+        $tsdb = undef
+    }
+
     #---
     $act_settings = $settings_tune + {
         'global' => {
@@ -234,6 +272,7 @@ class cfmetrics::netdata (
                 port   => $fact_port,
                 listen => $listen,
                 target => $target_address,
+                tsdb   => $tsdb,
             }
         ),
     }
