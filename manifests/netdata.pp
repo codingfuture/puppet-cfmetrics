@@ -40,6 +40,14 @@ class cfmetrics::netdata (
 
     Optional[ Hash[String[1],Any] ]
         $logstash = undef,
+    Optional[ Struct[{
+        url => String[1],
+        key => String[1],
+        env => Optional[String[1]],
+    }]]
+        $alerta = undef,
+    Hash
+        $alarm_conf = {},
 ) {
     $user = 'netdata'
     $group = $user
@@ -270,6 +278,18 @@ class cfmetrics::netdata (
         $tsdb = undef
     }
 
+    # HTTP(S) access for notifications
+    #---
+    cfnetwork::client_port { 'any:cfhttp:netdata':
+        user => $user,
+    }
+    cfnetwork::client_port { 'any:smtp:netdata':
+        user => $user,
+    }
+    cfnetwork::client_port { 'any:submission:netdata':
+        user => $user,
+    }
+
     #---
     $act_settings = $settings_tune + {
         'global' => {
@@ -285,6 +305,7 @@ class cfmetrics::netdata (
                 tsdb         => $tsdb,
                 registry     => $registry,
                 registry_url => $registry_url,
+                alerta       => !empty($alerta),
             }
         ),
     }
@@ -304,6 +325,15 @@ class cfmetrics::netdata (
         group   => $user,
         mode    => '0600',
         content => epp('cfmetrics/netdata_stream.conf.epp'),
+    }
+    -> file { "${root_dir}/etc/netdata/health_alarm_notify.conf":
+        owner   => $user,
+        group   => $user,
+        mode    => '0600',
+        content => epp('cfmetrics/health_alarm_notify.conf.epp', {
+            alerta     => $alerta,
+            alarm_conf => $alarm_conf,
+        }),
     }
     -> file { '/var/cache/netdata':
         ensure => directory,

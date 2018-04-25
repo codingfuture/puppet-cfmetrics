@@ -77,6 +77,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
         tsdb = cfmetrics_settings['tsdb']
         registry = cfmetrics_settings['registry']
         registry_url = cfmetrics_settings['registry_url']
+        alerta = cfmetrics_settings['alerta']
         
         #---
         conf_file = "#{conf_dir}/netdata.conf"
@@ -170,6 +171,14 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             systemctl('restart', "#{service_name}.service")
         else
             systemctl('start', "#{service_name}.service")
-        end        
+        end
+
+        if alerta
+            begin
+                sudo(['-u', user, '/opt/netdata/netdata-plugins/plugins.d/alarm-notify.sh', 'test'])
+            rescue
+                warning('Unable to send alerts to configured alerta.io instance')
+            end
+        end
     end
 end
