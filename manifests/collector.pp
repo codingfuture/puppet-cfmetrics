@@ -10,4 +10,6 @@ class cfmetrics::collector (
     include "cfmetrics::${type}"
 
     Cfmetrics::Collector::Nginx <| |>
+    Cfmetrics::Collector::Exim <| |>
+    Cfmetrics::Collector::Ntpd <| |>
 }

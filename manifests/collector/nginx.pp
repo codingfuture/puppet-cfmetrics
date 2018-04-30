@@ -26,8 +26,9 @@ define cfmetrics::collector::nginx() {
         $user = $cfmetrics::netdata::user
         $service_name = $cfmetrics::netdata::service_name
 
-        cfnetwork::client_port { "any:http:${user}":
+        cfnetwork::client_port { "local:http:${user}":
             user => $user,
+            dst  => $statshost,
         }
 
         Anchor['netdata-installed']
