@@ -8,4 +8,6 @@ class cfmetrics::collector (
         $type = 'netdata',
 ) {
     include "cfmetrics::${type}"
+
+    Cfmetrics::Collector::Nginx <| |>
 }

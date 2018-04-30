@@ -1,0 +1,11 @@
+<% |
+    $host,
+    $sites_dir,
+| -%>
+
+server {
+    listen <%= $host %>:80 bind;
+    server_name <%= $host %>;
+
+    include <%= $sites_dir %>/stats.server.*;
+}

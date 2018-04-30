@@ -355,4 +355,7 @@ class cfmetrics::netdata (
         settings_tune => $act_settings,
         service_name  => $service_name,
     }
+    -> service { $service_name:
+        enable => true,
+    }
 }

@@ -1,0 +1,4 @@
+
+location /nginx {
+    stub_status;
+}
