@@ -232,7 +232,7 @@ class cfmetrics::netdata (
     # Auto calculate memory
     #---
     $cfmetrics_tune = pick($settings_tune['cfmetrics'], {})
-    $base_mem = pick($cfmetrics_tune['base_mem'], 32)
+    $base_mem = pick($cfmetrics_tune['base_mem'], 48)
     $history_mem = pick($cfmetrics_tune['history_mem'], 10)
 
     if $server {

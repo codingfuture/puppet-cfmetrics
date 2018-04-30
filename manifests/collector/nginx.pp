@@ -24,6 +24,7 @@ define cfmetrics::collector::nginx() {
 
     if $cfmetrics::collector::type == 'netdata' {
         $user = $cfmetrics::netdata::user
+        $service_name = $cfmetrics::netdata::service_name
 
         cfnetwork::client_port { "any:http:${user}":
             user => $user,
@@ -41,9 +42,15 @@ define cfmetrics::collector::nginx() {
                 },
             }),
         }
-        ~> Service[$cfmetrics::netdata::service_name]
+        -> cfsystem_memory_weight { "${service_name}/${title}":
+            ensure => present,
+            weight => 0,
+            min_mb => 4,
+            max_mb => 4,
+        }
+        ~> Service[$service_name]
 
         Exec['cfweb_reload']
-        -> Service[$cfmetrics::netdata::service_name]
+        -> Service[$service_name]
     }
 }
