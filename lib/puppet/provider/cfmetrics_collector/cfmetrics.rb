@@ -163,7 +163,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
                 check_conf = {
                     'database' => healthcheck,
                     'user'     => healthcheck,
-                    'pass'     => password,
+                    'password' => password,
                     'host'     => settings_tune_cfdb['listen'] || '127.0.0.1',
                     'port'     => settings_tune_cfdb['port'],
                 }
