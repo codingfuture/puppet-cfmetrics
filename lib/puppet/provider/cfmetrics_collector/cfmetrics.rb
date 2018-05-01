@@ -189,6 +189,23 @@ Puppet::Type.type(:cfmetrics_collector).provide(
                                   db_conf.to_yaml, { :user => user })
         }
 
+        # HAProxy configs
+        #==================================================
+        haproxy_conf = {}
+        db_haproxy_index = Puppet::Type.type(:cfdb_haproxy).provider(:cfdb).get_config_index
+        db_haproxy = cf_system().config.get_new(db_haproxy_index) || {}
+
+        db_haproxy.each { |k ,v|
+            haproxy_service_name = v[:service_name]
+            haproxy_conf[haproxy_service_name] = {
+                'socket' => "/run/#{haproxy_service_name}/stats.sock",
+            }
+        }
+
+        cf_system.atomicWrite("#{conf_dir}/python.d/haproxy.conf",
+                              haproxy_conf.to_yaml, { :user => user })
+
+
         # Service File
         #==================================================
         start_timeout = 60

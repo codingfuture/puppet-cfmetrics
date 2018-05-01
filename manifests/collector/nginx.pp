@@ -49,9 +49,9 @@ define cfmetrics::collector::nginx() {
             min_mb => 4,
             max_mb => 4,
         }
-        ~> Service[$service_name]
+        -> Cfmetrics_collector[$service_name]
 
         Exec['cfweb_reload']
-        -> Service[$service_name]
+        -> Cfmetrics_collector[$service_name]
     }
 }

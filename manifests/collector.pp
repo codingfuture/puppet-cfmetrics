@@ -13,4 +13,5 @@ class cfmetrics::collector (
     Cfmetrics::Collector::Exim <| |>
     Cfmetrics::Collector::Ntpd <| |>
     Cfmetrics::Collector::Cfdb <| |>
+    Cfmetrics::Collector::Haproxy <| |>
 }
