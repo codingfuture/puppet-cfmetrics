@@ -11,6 +11,7 @@ define cfmetrics::collector::exim {
         Anchor['netdata-installed']
         -> cfauth::sudoentry { "${user}:exim":
             user          => $user,
+            # NOTE: tehre is still PAM noise in logs
             custom_config => [
                 "Cmnd_Alias EXIM_BPC = ${cmd}",
                 'Defaults!EXIM_BPC !syslog'
@@ -23,7 +24,7 @@ define cfmetrics::collector::exim {
             content => to_yaml({
                 local => {
                     command             => "/usr/bin/sudo ${cmd}",
-                    update_every        => 5,
+                    update_every        => 60,
                     autodetection_retry => 1,
                     retries             => 2147483647,
                 },

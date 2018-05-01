@@ -133,6 +133,62 @@ Puppet::Type.type(:cfmetrics_collector).provide(
         conf_changed = cf_system.atomicWriteIni(conf_file, conf_settings, { :user => user })
         need_restart ||= conf_changed
 
+        # Database health checks
+        #==================================================
+        db_health_conf = {}
+        db_instance_index = Puppet::Type.type(:cfdb_instance).provider(:cfdb).get_config_index
+        db_role_index = Puppet::Type.type(:cfdb_role).provider(:cfdb).get_config_index
+        db_instances = cf_system().config.get_new(db_instance_index) || {}
+        db_roles = cf_system().config.get_new(db_role_index) || {}
+
+        healthcheck = 'cfdbhealth'
+        db_roles.each { |k, rinfo|
+            next unless rinfo[:user] == healthcheck && rinfo[:database] == healthcheck
+
+            cluster = rinfo[:cluster]
+            password = rinfo[:password]
+            cinfo = db_instances[cluster]
+            db_type = cinfo[:type]
+
+            case db_type
+            when 'mysql'
+                check_conf = {
+                    'user'   => healthcheck,
+                    'pass'   => password,
+                    'socket' => "/run/#{cinfo[:service_name]}/service.sock",
+                }
+            when 'postgresql'
+                db_type = 'postgres'
+                settings_tune_cfdb = cinfo[:settings_tune]['cfdb']
+                check_conf = {
+                    'database' => healthcheck,
+                    'user'     => healthcheck,
+                    'pass'     => password,
+                    'host'     => settings_tune_cfdb['listen'],
+                    'port'     => settings_tune_cfdb['port'],
+                }
+            when 'elasticsearch'
+                settings_tune_cfdb = cinfo[:settings_tune]['cfdb']
+                check_conf = {
+                    'host'     => settings_tune_cfdb['listen'],
+                    'port'     => settings_tune_cfdb['port'],
+                }
+            else
+                next
+            end
+
+            check_conf['autodetection_retry'] = 1
+            check_conf['retries'] = 2147483647
+
+            db_health_conf[db_type] ||= {}
+            db_health_conf[db_type][cluster] = check_conf
+        }
+
+        db_health_conf.each { |db_type, db_conf|
+            cf_system.atomicWrite("#{conf_dir}/python.d/#{db_type}.conf",
+                                  db_conf.to_yaml, { :user => user })
+        }
+
         # Service File
         #==================================================
         start_timeout = 60
