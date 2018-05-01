@@ -30,6 +30,12 @@ define cfmetrics::collector::exim {
                 },
             }),
         }
+        -> cfsystem_memory_weight { "${service_name}/${title}":
+            ensure => present,
+            weight => 0,
+            min_mb => 4,
+            max_mb => 4,
+        }
         ~> Service[$service_name]
     }
 }

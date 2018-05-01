@@ -25,5 +25,12 @@ define cfmetrics::collector::cfdb (
         cfnetwork::client_port { "local:cfdb_${cluster}::${user}":
             user => $user,
         }
+
+        cfsystem_memory_weight { "${service_name}/cfdb-${title}":
+            ensure => present,
+            weight => 0,
+            min_mb => 4,
+            max_mb => 4,
+        }
     }
 }
