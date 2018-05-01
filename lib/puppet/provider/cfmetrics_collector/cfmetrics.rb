@@ -164,13 +164,13 @@ Puppet::Type.type(:cfmetrics_collector).provide(
                     'database' => healthcheck,
                     'user'     => healthcheck,
                     'pass'     => password,
-                    'host'     => settings_tune_cfdb['listen'],
+                    'host'     => settings_tune_cfdb['listen'] || '127.0.0.1',
                     'port'     => settings_tune_cfdb['port'],
                 }
             when 'elasticsearch'
                 settings_tune_cfdb = cinfo[:settings_tune]['cfdb']
                 check_conf = {
-                    'host'     => settings_tune_cfdb['listen'],
+                    'host'     => settings_tune_cfdb['listen'] || '127.0.0.1',
                     'port'     => settings_tune_cfdb['port'],
                 }
             else
