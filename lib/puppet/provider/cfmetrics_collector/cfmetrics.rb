@@ -215,6 +215,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             :io_weight => conf[:io_weight],
             :mem_limit => avail_mem,
             :mem_lock => true,
+            :cow_reserve => 32,
         })
         
         need_restart ||= service_changed
