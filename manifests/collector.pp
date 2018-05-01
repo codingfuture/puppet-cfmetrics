@@ -12,4 +12,5 @@ class cfmetrics::collector (
     Cfmetrics::Collector::Nginx <| |>
     Cfmetrics::Collector::Exim <| |>
     Cfmetrics::Collector::Ntpd <| |>
+    Cfmetrics::Collector::Cfdb <| |>
 }

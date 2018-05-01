@@ -10,7 +10,7 @@ define cfmetrics::collector::ntpd {
         cfnetwork::client_port { "local:ntp:${user}":
             user => $user,
         }
-        
+
         file { "${cfmetrics::netdata::root_dir}/etc/netdata/python.d/ntpd.conf":
             mode    => '0640',
             owner   => $user,
