@@ -358,4 +358,31 @@ class cfmetrics::netdata (
     -> service { $service_name:
         enable => true,
     }
+
+    # until PRs are merged
+    ensure_resource('package', 'patch')
+    Anchor['netdata-installed']
+    -> file { "${root_dir}/usr/libexec/netdata/tls_cert_patch.patch":
+        mode   => '0640',
+        owner  => $user,
+        source => 'puppet:///modules/cfmetrics/tls_cert_patch.patch',
+    }
+    -> exec { 'patch-netdata-tls-cert':
+        command => '/bin/true',
+        onlyif  => '/usr/bin/patch -p1 <tls_cert_patch.patch',
+        cwd     => "${root_dir}/usr/libexec/netdata",
+        user    => $user,
+    }
+    -> file { "${root_dir}/usr/libexec/netdata/python.d/puppet.chart.py":
+        mode   => '0640',
+        owner  => $user,
+        source => 'puppet:///modules/cfmetrics/puppet.chart.py',
+    }
+    -> file { "${root_dir}/etc/netdata/python.d/puppet.conf":
+        mode    => '0640',
+        owner   => $user,
+        content => to_yaml({}),
+        replace => false,
+    }
+    -> Cfmetrics_collector[$service_name]
 }

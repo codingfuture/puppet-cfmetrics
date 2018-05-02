@@ -199,11 +199,42 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             haproxy_service_name = v[:service_name]
             haproxy_conf[haproxy_service_name] = {
                 'socket' => "/run/#{haproxy_service_name}/stats.sock",
+                'autodetection_retry' => 1,
+                'retries' => 2147483647,
             }
         }
 
         cf_system.atomicWrite("#{conf_dir}/python.d/haproxy.conf",
                               haproxy_conf.to_yaml, { :user => user })
+
+        # puppet configs
+        #==================================================
+        puppet_conf = {}
+        puppetserver_index = Puppet::Type.type(:cf_puppetserver).provider(:cfprov).get_config_index
+        puppetdb_index = Puppet::Type.type(:cf_puppetdb).provider(:cfprov).get_config_index
+        fqdn = Facter['fqdn'].value()
+
+        if cf_system().config.get_new(puppetserver_index).size > 0
+            puppet_conf['puppetdb'] = {
+                'url' => "https://#{fqdn}:8140",
+                'tls_ca_file'   => "#{root_dir}/pki/puppet/ca.crt",
+                'tls_key_file'  => "#{root_dir}/pki/puppet/local.key",
+                'tls_cert_file' => "#{root_dir}/pki/puppet/local.crt",
+                'autodetection_retry' => 1,
+                'retries' => 2147483647,
+            }
+        end
+
+        if cf_system().config.get_new(puppetdb_index).size > 0
+            puppet_conf['puppetserver'] = {
+                'url'           => "https://#{fqdn}:8140",
+                'autodetection_retry' => 1,
+                'retries' => 2147483647,
+            }
+        end
+
+        cf_system.atomicWrite("#{conf_dir}/python.d/puppet.conf",
+                              puppet_conf.to_yaml, { :user => user })
 
 
         # Service File
