@@ -214,7 +214,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
         puppetdb_index = Puppet::Type.type(:cf_puppetdb).provider(:cfprov).get_config_index
         fqdn = Facter['fqdn'].value()
 
-        if cf_system().config.get_new(puppetserver_index).size > 0
+        if (cf_system().config.get_new(puppetserver_index) || []).size > 0
             puppet_conf['puppetdb'] = {
                 'url' => "https://#{fqdn}:8140",
                 'tls_ca_file'   => "#{root_dir}/pki/puppet/ca.crt",
@@ -225,7 +225,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             }
         end
 
-        if cf_system().config.get_new(puppetdb_index).size > 0
+        if (cf_system().config.get_new(puppetdb_index) || []).size > 0
             puppet_conf['puppetserver'] = {
                 'url'           => "https://#{fqdn}:8140",
                 'autodetection_retry' => 1,
