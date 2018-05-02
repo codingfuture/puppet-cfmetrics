@@ -22,12 +22,12 @@ retries = 180
 ORDER = [
     'jvm_heap',
     'jvm_nonheap',
-    'fd_open',
     'cpu',
+    'fd_open',
 ]
 CHARTS = {
     'jvm_heap': {
-        'options': [None, "JVM Heap", "MB", "memory", "puppet.jvm", "area"],
+        'options': [None, "JVM Heap", "MB", "resources", "puppet.jvm", "area"],
         'lines': [
             ["jvm_heap_max", 'max', "absolute", 1, 1048576, 'hidden'],
             ["jvm_heap_committed", 'committed', "absolute", 1, 1048576],
@@ -36,7 +36,7 @@ CHARTS = {
         ]
     },
     'jvm_nonheap': {
-        'options': [None, "JVM Non-Heap", "MB", "memory", "puppet.jvm", "area"],
+        'options': [None, "JVM Non-Heap", "MB", "resources", "puppet.jvm", "area"],
         'lines': [
             ["jvm_nonheap_max", 'max', "absolute", 1, 1048576, 'hidden'],
             ["jvm_nonheap_committed", 'committed', "absolute", 1, 1048576],
@@ -44,18 +44,18 @@ CHARTS = {
             ["jvm_nonheap_init", 'initial', "absolute", 1, 1048576, 'hidden'],
         ]
     },
-    'fd_open': {
-        'options': [None, "File Descriptors", "descriptors", "overview", "puppet.fdopen", "line"],
-        'lines': [
-            ["fd_max", 'max', "absolute", 1, 1, 'hidden'],
-            ["fd_used", 'used', "absolute"],
-        ]
-    },
     'cpu': {
-        'options': [None, "File Descriptors", "descriptors", "overview", "puppet.cpu", "stacked"],
+        'options': [None, "CPU usage", "descriptors", "resources", "puppet.cpu", "stacked"],
         'lines': [
             ["cpu_time", 'execution', "absolute", 1, 1000],
             ["gc_time", 'GC', "absolute", 1, 1000],
+        ]
+    },
+    'fd_open': {
+        'options': [None, "File Descriptors", "descriptors", "resources", "puppet.fdopen", "line"],
+        'lines': [
+            ["fd_max", 'max', "absolute", 1, 1, 'hidden'],
+            ["fd_used", 'used', "absolute"],
         ]
     },
 }
