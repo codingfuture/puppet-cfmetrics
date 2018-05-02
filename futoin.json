@@ -1,6 +1,6 @@
 {
   "name": "codingfuture-cfmetrics",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "vcs": "git",
   "package": [
     "pkg"
