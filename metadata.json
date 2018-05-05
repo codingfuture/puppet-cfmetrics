@@ -2,7 +2,7 @@
   "name": "codingfuture-cfmetrics",
   "version": "1.0.0",
   "author": "Andrey Galkin",
-  "summary": "Centralized metric collection and monitoring solution.",
+  "summary": "Centralized metrics collection and monitoring solution.",
   "license": "Apache-2.0",
   "source": "https://github.com/codingfuture/puppet-cfmetrics",
   "project_page": "https://github.com/codingfuture/puppet-cfmetrics",

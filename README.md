@@ -1,6 +1,6 @@
 # cfmetrics
 
-Centralized metric collection and monitoring solution.
+Centralized metrics collection and monitoring solution.
 
 ## Description
 
@@ -25,16 +25,16 @@ Centralized metric collection and monitoring solution.
 * **cfsystem::metric** - abstract declaration of "collectable" resource.
 * **Target** - host to send metrics to collector-defined way.
 * **Alert** - preconfigured notification for infrastructure health state.
-* **AlertManager** - special high-available solution Alert notifications  like Alerta.io
+* **AlertManager** - special high-available solution for Alert notifications like Alerta.io
 
 Collector gather all system info it can. All `cf*` modules declare support for metrics
-of various services. If `cfmetrics` module is loaded then the declaration are used
+of various services. If `cfmetrics` module is loaded then the declarations are used
 to automatically discover resources to monitor.
 
 #### Netdata collector
 
 Netdata allows building efficient data gathering topology. By default, all instances
-act in standalone mode with own hisotry. If collector target is configured, then netdata
+act in standalone mode with own history. If collector target is configured, then netdata
 does not maintain history - only push buffer.
 
 It's possible to run own netdata registry.
@@ -42,7 +42,7 @@ It's possible to run own netdata registry.
 Both binary and source installations are possible. Automatic update is tried on Puppet
 catalog run, but not more often than once in 1 hour.
 
-Just for reference, a special LogStash instance accept TSDB input format is supported
+Just for reference, a special LogStash instance accepting TSDB input format is supported
 to store metrics in Elasticsearch the efficient way. It suits small scale to unify
 logging and metrics centralization. For larger cases, Prometheus is suggested.
 
