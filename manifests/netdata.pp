@@ -57,7 +57,7 @@ class cfmetrics::netdata (
     # Based on: https://github.com/firehol/netdata/wiki/Installation#1-prepare-your-system
 
     ensure_packages([
-        'bash', 'curl', 'iproute',
+        'bash', 'curl', 'iproute2',
         'python', 'python-yaml', 'python-beanstalkc',
         'python-dnspython', 'python-ipaddress',
         # to be part of cfdb setup metric setup

@@ -1,4 +1,7 @@
 
+# (next)
+CHANGED: updated for Ubuntu 18.04 Bionic support
+
 # 1.0.1 (2018-05-08)
 CHANGED: dropped netdata patches/plugins which have been merged into upstream
 
