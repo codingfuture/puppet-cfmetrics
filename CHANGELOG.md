@@ -1,5 +1,5 @@
 
-# (next)
+# 1.1.0 (2018-12-09)
 CHANGED: updated for Ubuntu 18.04 Bionic support
 
 # 1.0.1 (2018-05-08)
