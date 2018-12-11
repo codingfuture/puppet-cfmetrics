@@ -7,6 +7,9 @@
     enabled = yes
     destination = <%= $destination %>
     api key = <%= fqdn_uuid($cfmetrics::netdata::target) %>
+    timeout seconds = 10
+    reconnect delay seconds = 1
+    #buffer size bytes =
 <% } -%>
 
 <% if $cfmetrics::netdata::server { -%>
@@ -15,4 +18,5 @@
     allow from = *
     default history = <%= pick($settings['global']['history'], 600) %>
     default memory mode = save
+    multiple connections = allow
 <% } -%>

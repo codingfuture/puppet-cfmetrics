@@ -86,6 +86,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
                 'hostname' => Facter['fqdn'].value(),
                 'config directory' => conf_dir,
                 'cache directory' => cache_dir,
+                'debug log' => 'syslog',
                 'error log' => 'syslog',
                 'access log' => 'syslog',
                 'run as user' => user,
