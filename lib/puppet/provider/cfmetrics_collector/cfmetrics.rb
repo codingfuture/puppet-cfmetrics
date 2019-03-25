@@ -179,7 +179,6 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             end
 
             check_conf['autodetection_retry'] = 1
-            check_conf['retries'] = 2147483647
 
             db_health_conf[db_type] ||= {}
             db_health_conf[db_type][cluster] = check_conf
