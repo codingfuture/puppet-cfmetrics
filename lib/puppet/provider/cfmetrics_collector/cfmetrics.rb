@@ -152,6 +152,14 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             db_type = cinfo[:type]
 
             case db_type
+            when 'mongodb'
+                settings_tune_cfdb = cinfo[:settings_tune]['cfdb']
+                check_conf = {
+                    'authdb' => healthcheck,
+                    'user'   => healthcheck,
+                    'pass'   => password,
+                    'host' => "/run/#{cinfo[:service_name]}/mongodb-#{settings_tune_cfdb['port']}.sock",
+                }
             when 'mysql'
                 check_conf = {
                     'user'   => healthcheck,

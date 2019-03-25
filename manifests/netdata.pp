@@ -358,4 +358,20 @@ class cfmetrics::netdata (
     -> service { $service_name:
         enable => true,
     }
+
+    # until PRs are merged
+    ensure_resource('package', 'patch')
+    Anchor['netdata-installed']
+    -> file { "${root_dir}/usr/libexec/netdata/netdata_mongodb.patch":
+        mode   => '0640',
+        owner  => $user,
+        source => 'puppet:///modules/cfmetrics/netdata_mongodb.patch',
+    }
+    -> exec { 'patch-netdata-mongodb':
+        command => '/bin/true',
+        onlyif  => '/usr/bin/patch -p1 <netdata_mongodb.patch',
+        cwd     => "${root_dir}/usr/libexec/netdata",
+        user    => $user,
+    }
+    -> Cfmetrics_collector[$service_name]
 }
