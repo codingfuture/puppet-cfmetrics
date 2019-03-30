@@ -1,6 +1,7 @@
 # (next)
 FIXED: netdata streaming issues in some environments
 FIXED: removed 'retries' configuration for netdata plugins
+FIXED: monitoring of secondary cfdb nodes
 NEW: MongoDB monitoring support
 NEW: Redis monitoring support
 

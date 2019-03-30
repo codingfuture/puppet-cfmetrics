@@ -138,18 +138,20 @@ Puppet::Type.type(:cfmetrics_collector).provide(
         #==================================================
         db_health_conf = {}
         db_instance_index = Puppet::Type.type(:cfdb_instance).provider(:cfdb).get_config_index
-        db_role_index = Puppet::Type.type(:cfdb_role).provider(:cfdb).get_config_index
+        db_access_index = Puppet::Type.type(:cfdb_access).provider(:cfdb).get_config_index
         db_instances = cf_system().config.get_new(db_instance_index) || {}
-        db_roles = cf_system().config.get_new(db_role_index) || {}
+        db_accesses = cf_system().config.get_new(db_access_index) || {}
 
         healthcheck = 'cfdbhealth'
-        db_roles.each { |k, rinfo|
-            next unless rinfo[:user] == healthcheck && rinfo[:database] == healthcheck
+        db_accesses.each { |k, ainfo|
+            next unless ainfo[:role] == healthcheck and ainfo[:local_user] == user
 
-            cluster = rinfo[:cluster]
-            password = rinfo[:password]
+            cluster = ainfo[:cluster]
+            password = ainfo[:config_info]['password']
             cinfo = db_instances[cluster]
             db_type = cinfo[:type]
+
+            next if cinfo[:is_arbitrator]
 
             case db_type
             when 'mongodb'
@@ -175,6 +177,12 @@ Puppet::Type.type(:cfmetrics_collector).provide(
                     'password' => password,
                     'host'     => settings_tune_cfdb['listen'] || '127.0.0.1',
                     'port'     => settings_tune_cfdb['port'],
+                }
+            when 'redis'
+                db_type = 'redis'
+                check_conf = {
+                    'socket' => "/run/#{cinfo[:service_name]}/service.sock",
+                    'pass'     => password,
                 }
             when 'redis'
                 db_type = 'redis'

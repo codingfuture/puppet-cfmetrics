@@ -11,6 +11,22 @@ define cfmetrics::collector::cfdb (
         $user = $cfmetrics::netdata::user
         $service_name = $cfmetrics::netdata::service_name
 
+        $role_info_raw = cfsystem::query([
+            'from', 'resources', ['extract', [ 'certname', 'parameters' ],
+                ['and',
+                    ['=', 'type', 'Cfdb_role'],
+                    ['=', ['parameter', 'cluster'], $cluster],
+                    ['=', ['parameter', 'user'], $role],
+            ],
+        ]])
+
+        $role_info = size($role_info_raw) ? {
+            0       => {
+                'password' => cfsystem::gen_pass("cfdb/${cluster}@${role}", 16),
+            },
+            default => $role_info_raw[0]['parameters']
+        }
+
         cfdb_access{ "cfmetrics:${title}":
             ensure          => present,
             cluster         => $cluster,
@@ -18,11 +34,13 @@ define cfmetrics::collector::cfdb (
             local_user      => $user,
             max_connections => 2,
             client_host     => 'localhost',
-            config_info     => {},
+            config_info     => {
+                password => $role_info['password']
+            },
             require         => Anchor['cfnetwork:firewall'],
         }
 
-        cfnetwork::client_port { "local:cfdb_${cluster}::${user}":
+        cfnetwork::client_port { "local:cfdb_${cluster}:${user}":
             user => $user,
         }
 
