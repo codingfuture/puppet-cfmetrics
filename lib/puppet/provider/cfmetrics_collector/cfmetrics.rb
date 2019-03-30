@@ -176,6 +176,12 @@ Puppet::Type.type(:cfmetrics_collector).provide(
                     'host'     => settings_tune_cfdb['listen'] || '127.0.0.1',
                     'port'     => settings_tune_cfdb['port'],
                 }
+            when 'redis'
+                db_type = 'redis'
+                check_conf = {
+                    'socket' => "/run/#{cinfo[:service_name]}/service.sock",
+                    'pass'     => password,
+                }
             when 'elasticsearch'
                 settings_tune_cfdb = cinfo[:settings_tune]['cfdb']
                 check_conf = {
