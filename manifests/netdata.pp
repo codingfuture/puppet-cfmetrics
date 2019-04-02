@@ -65,6 +65,7 @@ class cfmetrics::netdata (
         'lm-sensors', 'libmnl0', 'netcat',
         # misc
         'libnetfilter-acct1',
+        'jq'
     ])
 
     if $binary_install {
@@ -86,18 +87,20 @@ class cfmetrics::netdata (
         ]
     }
 
-    $latest_binary_stamp = '/etc/cfsystem/netdata-latest.gz.run'
+    $latest_binary_stamp = '/etc/cfsystem/netdata-latest-release'
     $installled_binary_stamp = "${root_dir}/etc/netdata/uptodate.stamp"
 
     # Get new version not more often than once per day.
     # The stamp can be always removed manually to force update check.
     exec { 'Getting latest netdata version':
         command => [
-            "/usr/bin/wget -O${latest_binary_stamp}.tmp",
-            "'https://raw.githubusercontent.com/firehol/binary-packages/master/netdata-latest.gz.run'",
+            '/usr/bin/curl -Ssf --connect-timeout 5',
+            "'https://api.github.com/repos/netdata/netdata/releases/latest'",
+            " | /usr/bin/jq .tag_name > ${latest_binary_stamp}.tmp",
             "&& /bin/mv -f ${latest_binary_stamp}.tmp ${latest_binary_stamp}",
         ].join(' '),
         unless  => "/usr/bin/find ${latest_binary_stamp} -mtime -1 | /bin/grep -q '^'",
+        require => Package['jq']
     }
     -> file { $latest_binary_stamp:
         ensure  => file,
@@ -111,7 +114,7 @@ class cfmetrics::netdata (
             '/bin/bash',
             '--',
             '/dev/stdin',
-            '--dont-wait --dont-start-it',
+            '--dont-wait --dont-start-it --stable-channel',
             $extra_opts,
             "&& /bin/cp -f ${latest_binary_stamp} ${installled_binary_stamp}",
         ]).join(' '),
