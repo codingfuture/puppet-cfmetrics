@@ -1,4 +1,5 @@
 
 location /nginx {
+    access_log off;
     stub_status;
 }

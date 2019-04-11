@@ -3,6 +3,7 @@ FIXED: netdata streaming issues in some environments
 FIXED: removed 'retries' configuration for netdata plugins
 FIXED: monitoring of secondary cfdb nodes
 FIXED: nginx monitoring when no hosts listens on port 80
+FIXED: not to add access_log for stats endpoint
 CHANGED: to use netdata stable release channel
 NEW: MongoDB monitoring support
 NEW: Redis monitoring support

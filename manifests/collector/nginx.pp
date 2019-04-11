@@ -4,6 +4,7 @@
 
 define cfmetrics::collector::nginx() {
     include cfmetrics::statshost
+    include cfweb::nginx
 
     $statshost = $cfmetrics::statshost::host
     $sites_dir = $cfweb::nginx::sites_dir
@@ -15,6 +16,7 @@ define cfmetrics::collector::nginx() {
             host      => $statshost,
             sites_dir => $sites_dir,
         }),
+        notify  => Exec['cfweb_reload'],
     }
     -> file {"${sites_dir}/stats.server.nginx":
         mode    => '0640',
