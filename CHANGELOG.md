@@ -1,4 +1,4 @@
-# (next)
+# 1.3.0 (2019-04-14)
 FIXED: netdata streaming issues in some environments
 FIXED: removed 'retries' configuration for netdata plugins
 FIXED: monitoring of secondary cfdb nodes
