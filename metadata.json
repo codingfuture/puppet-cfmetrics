@@ -36,23 +36,23 @@
     },
     {
       "name": "codingfuture-cfnetwork",
-      "version_requirement": ">= 1.1.0 <2.0.0"
+      "version_requirement": ">= 1.3.0 <2.0.0"
     },
     {
       "name": "codingfuture-cfsystem",
-      "version_requirement": ">= 1.2.0 <2.0.0"
+      "version_requirement": ">= 1.3.0 <2.0.0"
     },
     {
       "name": "codingfuture-cfdb",
-      "version_requirement": ">= 1.1.0 <2.0.0"
+      "version_requirement": ">= 1.3.0 <2.0.0"
     },
     {
       "name": "codingfuture-cflogsink",
-      "version_requirement": ">= 1.1.0 <2.0.0"
+      "version_requirement": ">= 1.3.0 <2.0.0"
     },
     {
       "name": "codingfuture-cfweb",
-      "version_requirement": ">= 1.2.0 <2.0.0"
+      "version_requirement": ">= 1.3.0 <2.0.0"
     }
   ],
   "data_provider": "hiera"
