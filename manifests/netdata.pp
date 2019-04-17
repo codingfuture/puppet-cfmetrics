@@ -154,6 +154,25 @@ class cfmetrics::netdata (
             $memo + $v['certname']
         }
 
+        # Due to a bug in PuppetDB AST, ['in', [['parameter', 'target']], ... this fails as subquery above
+        # So, this inefficient workaround is required.
+        $indirect_clients = cfsystem::query([
+            'from', 'resources',
+                ['extract', [ 'certname', 'parameters' ],
+                    ['and',
+                        ['=', 'title', 'Cfmetrics::Netdata'],
+                        ['=', 'type', 'Class'],
+                        ['or'] + $client_hosts.map |$ch| {
+                            ['=', ['parameter', 'target'], $ch ]
+                        },
+                    ],
+                ],
+        ])
+
+        $indirect_client_hosts = $indirect_clients.reduce( [] ) |$memo, $v| {
+            $memo + $v['certname']
+        }
+
         ensure_resource('cfnetwork::describe_service', $user, {
             server => "tcp/${fact_port}",
         })
@@ -239,7 +258,7 @@ class cfmetrics::netdata (
     $history_mem = pick($cfmetrics_tune['history_mem'], 10)
 
     if $server {
-        $auto_memory_min = $base_mem + $history_mem + ($history_mem * size($clients))
+        $auto_memory_min = $base_mem + $history_mem + ($history_mem * size($clients + $indirect_clients))
     } elsif $target_address {
         $auto_memory_min = $base_mem
     } else {
