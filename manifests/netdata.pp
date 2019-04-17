@@ -305,6 +305,7 @@ class cfmetrics::netdata (
                 registry     => $registry,
                 registry_url => $registry_url,
                 alerta       => !empty($alerta),
+                server       => $server,
             }
         ),
     }

@@ -78,6 +78,7 @@ Puppet::Type.type(:cfmetrics_collector).provide(
         registry = cfmetrics_settings['registry']
         registry_url = cfmetrics_settings['registry_url']
         alerta = cfmetrics_settings['alerta']
+        server = cfmetrics_settings['server']
         
         #---
         conf_file = "#{conf_dir}/netdata.conf"
@@ -100,9 +101,12 @@ Puppet::Type.type(:cfmetrics_collector).provide(
             'registry' => {},
         }
 
+        if !server
+            conf_settings['web']['mode'] = 'none'
+        end
+
         if target
             conf_settings['global']['memory mode'] = 'none'
-            conf_settings['web']['mode'] = 'none'
         end
 
         if tsdb
