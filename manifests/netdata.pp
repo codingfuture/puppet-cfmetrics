@@ -295,10 +295,6 @@ class cfmetrics::netdata (
 
     #---
     $act_settings = $settings_tune + {
-        'global' => {
-            'update every' => 1,
-            'history' => 600,
-        },
         'cfmetrics' => merge(
             $cfmetrics_tune,
             {
