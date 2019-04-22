@@ -16,7 +16,7 @@
 [<%= fqdn_uuid($::facts['fqdn']) %>]
     enabled = yes
     allow from = *
-    default history = <%= pick($settings['global']['history'], 600) %>
+    default history = <%= pick($settings.dig('global','history'), 600) %>
     default memory mode = save
     multiple connections = allow
 <% } -%>
