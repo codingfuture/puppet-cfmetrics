@@ -1,6 +1,7 @@
 # (next)
 CHANGED: not to enforce update rate and history size for netdata
 NEW: netdata stateless proxy mode support
+NEW: Prometheus support
 
 # 1.3.0 (2019-04-14)
 FIXED: netdata streaming issues in some environments

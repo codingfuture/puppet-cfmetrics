@@ -8,8 +8,14 @@ class cfmetrics (
         $collect = true,
     Cfnetwork::Bindface
         $iface = 'local',
+    Boolean
+        $prometheus = false,
 ) {
     if $collect {
         include cfmetrics::collector
+    }
+
+    if $prometheus {
+        include cfmetrics::prometheus
     }
 }

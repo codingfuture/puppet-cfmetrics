@@ -126,8 +126,10 @@ class cfmetrics::netdata (
     #---
     if $iface == 'any' {
         $listen = '*'
+        $fact_host = '127.0.0.1'
     } else {
         $listen = cfnetwork::bind_address($iface)
+        $fact_host = $listen
     }
 
     $fact_port = cfsystem::gen_port($service_name, $port)

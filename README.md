@@ -12,6 +12,9 @@ Centralized metrics collection and monitoring solution.
         - Easily extendable
         - StatsD emulation
         - Integrated with cfsystem memory distribution.
+* Time series database:
+	* prometheus
+		- Grabs directly from nedata
 * Specialized alert managing software support
     - fine control of notification methods
     - advanced filtering & history
@@ -106,4 +109,24 @@ Generic collector functionality.
     - `key` - secret API key
     - `env` - Alerta.io environment (scope)
 * `$alarm_conf = {}` - fine tune of alarm config
+
+### `cfmetrics::prometheus` class
+
+Uses `cfweb` to run up to date `prom/prometheus:latest` container.
+
+* `$memory_weight = 1`
+* `$memory_min = 256`
+* `$memory_max = undef`
+* `$cpu_weight = 10`
+* `$io_weight = 10`
+* `$iface = $cfmetrics::iface`
+* `$port = 9090`
+* `$prometheus_tune = {}`
+* `$image =`
+	- `image => 'prom/prometheus'`
+    - `image_tag => 'latest'`
+
+* `$server_name = "prometheus.${::facts['fqdn']}"`
+* `$site_params = {}`
+* `$rules = {}`
 
