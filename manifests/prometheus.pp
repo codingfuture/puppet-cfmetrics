@@ -57,6 +57,15 @@ class cfmetrics::prometheus(
     }
 
     cfnetwork::service_port { "docker:${cfmetrics::netdata::user}:prometheus": }
+    cfnetwork::service_port { 'docker:prometheus': }
+    cfnetwork::describe_service { 'prometheus':
+        server => "tcp/${port}",
+    }
+
+    $alertmanagers = $alertmanager ? {
+        true => [ { targets => [ '172.18.0.1:9093' ] } ],
+        default => [],
+    }
 
     $prometheus_tune_all = deep_merge(
         {
@@ -65,10 +74,9 @@ class cfmetrics::prometheus(
                 'evaluation_interval' => '30s',
             },
             'alerting' => {
-                'alertmanagers' => $alertmanager ? {
-                    true => [ 'alertmanager:9093' ],
-                    default => [],
-                }
+                'alertmanagers' => [ {
+                    static_configs => $alertmanagers,
+                } ],
             },
         },
         $prometheus_tune,
@@ -96,8 +104,8 @@ class cfmetrics::prometheus(
         }
     )
 
-    $prometheus_tune_all['alerting']['alertmanagers'].each |$v| {
-        $hp = $v.split(':')
+    $alertmanagers.each |$v| {
+        $hp = $v['targets'][0].split(':')
 
         if $hp[0] != 'alertmanager' {
             $fws = "alertmanager${hp[1]}"
@@ -145,7 +153,10 @@ class cfmetrics::prometheus(
                 memory_weight => $memory_weight,
                 memory_min    => $memory_min,
                 memory_max    => $memory_max,
-                upstream      => { port => $port },
+                upstream      => {
+                    host => '172.18.0.1',
+                    port => $port,
+                },
             },
         },
         deploy             => {

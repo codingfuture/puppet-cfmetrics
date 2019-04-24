@@ -18,7 +18,7 @@ class cfmetrics::alertmanager(
     Cfnetwork::Bindface
         $iface = $cfmetrics::iface,
     Cfnetwork::Port
-        $port = 9090,
+        $port = 9093,
     Hash
         $alertmanager_tune = {},
     CfWeb::DockerImage $image = {
@@ -34,31 +34,33 @@ class cfmetrics::alertmanager(
     include cfweb::appcommon::docker
     include cfweb::nginx
 
-    if !$cfsystem::email::listen_ifaces or (
-        !('docker' in $cfsystem::email::listen_ifaces) and
-        !('any' in $cfsystem::email::listen_ifaces)
-    ) {
-        fail('Host email system must listen on "docker" interface')
+    if !$cfsystem::email::listen_iface_ips {
+        fail('Host email system must listen on non-local interface')
     }
 
-    $user = 'app_prometheus'
+    $user = 'app_alertmanager'
     $site_dir = "${cfweb::nginx::web_dir}/${user}"
+
+    cfnetwork::service_port { 'docker:alertmanager': }
+    cfnetwork::describe_service { 'alertmanager':
+        server => "tcp/${port}",
+    }
 
     $alertmanager_tune_all = deep_merge(
         {
             global => {
-                smtp_smarthost => '172.18.0.1:25',
+                smtp_smarthost => "${cfsystem::email::listen_iface_ips[0]}:25",
                 smtp_from => "alert@${::trusted['domain']}",
             },
             route => {
                 receiver => admin,
             },
-            receivers => [
+            receivers => [{
                 name => admin,
-                email_configs => {
+                email_configs => [{
                     to => pick($cfsystem::admin_email, "admin@${::trusted['domain']}"),
-                }
-            ],
+                }],
+            }],
         },
         $alertmanager_tune,
     )
@@ -87,11 +89,14 @@ class cfmetrics::alertmanager(
                 memory_weight => $memory_weight,
                 memory_min    => $memory_min,
                 memory_max    => $memory_max,
-                upstream      => { port => $port },
+                upstream      => {
+                    host => '172.18.0.1',
+                    port => $port,
+                },
             },
         },
         deploy             => {
-            target_port   => 9090,
+            target_port   => 9093,
             image         => $image,
             binds         => {
                 'alertmanager.yml' => '/etc/alertmanager/alertmanager.yml',
