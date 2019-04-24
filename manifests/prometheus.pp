@@ -9,7 +9,7 @@ class cfmetrics::prometheus(
     Optional[Integer[1]]
         $memory_min = 256,
     Optional[Integer[1]]
-        $memory_max = undef,
+        $memory_max = 512,
     Cfsystem::CpuWeight
         $cpu_weight = 10,
     Cfsystem::IoWeight
@@ -29,6 +29,7 @@ class cfmetrics::prometheus(
     String[1] $server_name = "prometheus.${::facts['fqdn']}",
     Hash[String[1], Any] $site_params = {},
     Hash $rules = {},
+    Boolean $alertmanager = true,
 ) {
     include cfmetrics::collector
     include cfweb::appcommon::docker
@@ -57,34 +58,57 @@ class cfmetrics::prometheus(
 
     cfnetwork::service_port { "docker:${cfmetrics::netdata::user}:prometheus": }
 
-    $prometheus_tune_all = {
-        'global' => {
-            'scrape_interval' => '30s',
-            'evaluation_interval' => '30s',
+    $prometheus_tune_all = deep_merge(
+        {
+            'global' => {
+                'scrape_interval' => '30s',
+                'evaluation_interval' => '30s',
+            },
+            'alerting' => {
+                'alertmanagers' => $alertmanager ? {
+                    true => [ 'alertmanager:9093' ],
+                    default => [],
+                }
+            },
         },
-    } + $prometheus_tune + {
-        rule_files     => $rules.map |$k, $v| { "/etc/prometheus/${k}.rules" },
-        scrape_configs => [
-            {
-                job_name       => prometheus,
-                static_configs => [
-                    { targets => ['0.0.0.0:9090'] }
-                ]
-            },
-            {
-                job_name       => netdata,
-                metrics_path   => '/api/v1/allmetrics',
-                params => {
-                    format => [prometheus_all_hosts]
+        $prometheus_tune,
+        {
+            rule_files     => $rules.map |$k, $v| { "/etc/prometheus/${k}.rules" },
+            scrape_configs => [
+                {
+                    job_name       => prometheus,
+                    static_configs => [
+                        { targets => ['0.0.0.0:9090'] }
+                    ]
                 },
-                honor_labels => true,
-                static_configs => [
-                    { targets => ["${netdata_host}:${netdata_port}"] },
-                ],
-            },
-        ],
-        'alerting' => {
-            'alertmanagers' => [],
+                {
+                    job_name       => netdata,
+                    metrics_path   => '/api/v1/allmetrics',
+                    params => {
+                        format => [prometheus_all_hosts]
+                    },
+                    honor_labels => true,
+                    static_configs => [
+                        { targets => ["${netdata_host}:${netdata_port}"] },
+                    ],
+                },
+            ],
+        }
+    )
+
+    $prometheus_tune_all['alerting']['alertmanagers'].each |$v| {
+        $hp = $v.split(':')
+
+        if $hp[0] != 'alertmanager' {
+            $fws = "alertmanager${hp[1]}"
+            ensure_resource(
+                'cfnetwork::describe_service',
+                $fws,
+                { server => "tcp/${hp[1]}" }
+            )
+            cfnetwork::router_port { "docker/any:${fws}":
+                dst => $hp[0],
+            }
         }
     }
 
@@ -138,4 +162,9 @@ class cfmetrics::prometheus(
             config_files  => [$config_file],
         },
     })
+
+    # ---
+    if $alertmanager {
+        include cfmetrics::alertmanager
+    }
 }

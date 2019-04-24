@@ -13,8 +13,11 @@ Centralized metrics collection and monitoring solution.
         - StatsD emulation
         - Integrated with cfsystem memory distribution.
 * Time series database:
-	* prometheus
-		- Grabs directly from nedata
+    * prometheus
+        - Scraps directly from nedata
+* Alerts:
+    * Simple Alerta for plain Netdata case
+    * AlertManager for Prometheus case
 * Specialized alert managing software support
     - fine control of notification methods
     - advanced filtering & history
@@ -123,10 +126,14 @@ Uses `cfweb` to run up to date `prom/prometheus:latest` container.
 * `$port = 9090`
 * `$prometheus_tune = {}`
 * `$image =`
-	- `image => 'prom/prometheus'`
+    - `image => 'prom/prometheus'`
     - `image_tag => 'latest'`
 
 * `$server_name = "prometheus.${::facts['fqdn']}"`
 * `$site_params = {}`
 * `$rules = {}`
+
+### `cfmetrics::alertmanager` class
+
+Configures AlertManager for Prometheus
 

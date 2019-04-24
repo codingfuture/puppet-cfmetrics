@@ -8,7 +8,11 @@
 
 # Email backup for critical
 #---
+<% if $cfmetrics::prometheus { -%>
+SEND_EMAIL="NO"
+<% } else { -%>
 SEND_EMAIL="YES"
+<% } -%>
 DEFAULT_RECIPIENT_EMAIL="root|critical"
 
 # alerta.io
