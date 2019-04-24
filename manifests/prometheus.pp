@@ -93,7 +93,9 @@ class cfmetrics::prometheus(
                     job_name       => netdata,
                     metrics_path   => '/api/v1/allmetrics',
                     params => {
-                        format => [prometheus_all_hosts]
+                        format     => [prometheus_all_hosts],
+                        variables  => ['yes'],
+                        timestamps => ['no'],
                     },
                     honor_labels => true,
                     static_configs => [
