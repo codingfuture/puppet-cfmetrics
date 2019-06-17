@@ -1,4 +1,4 @@
-# (next)
+# 1.3.1 (2019-06-17)
 CHANGED: not to enforce update rate and history size for netdata
 NEW: netdata stateless proxy mode support
 NEW: Prometheus support
